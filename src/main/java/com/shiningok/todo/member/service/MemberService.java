@@ -2,6 +2,7 @@ package com.shiningok.todo.member.service;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,13 +10,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.shiningok.todo.member.data.LoginVO;
+import com.shiningok.todo.member.entity.MemberImageEntity;
 import com.shiningok.todo.member.entity.MemberInfoEntity;
+import com.shiningok.todo.member.repository.MemberImageRepository;
 import com.shiningok.todo.member.repository.MemberRepository;
 import com.shiningok.todo.utils.AESAlgorithm;
 
 @Service
 public class MemberService {
   @Autowired MemberRepository m_repo;
+  @Autowired MemberImageRepository mi_repo;
+  private Long miSeq;
+public Map <String, Object> addMemberImage(MemberImageEntity data, Long miSeq) {
+    Map<String, Object> resultMap = new LinkedHashMap<String , Object>();
+    data.setMiSeq(miSeq);
+    mi_repo.save(data);
+    resultMap.put("status", true);
+    resultMap.put("message", "이미지 저장 완");
+    resultMap.put("code", HttpStatus.OK);
+    return resultMap;
+  }
+public String getFilenameByUri(String uri) {
+   List<MemberImageEntity> data = mi_repo.findTopByUriOrderBySeqDesc(uri);
+   return data.get(0).getFileName();
+}
   public Map<String, Object> addMember(MemberInfoEntity data) { // ctrl + . -> 빠른수정
     Map <String, Object> resultMap = new LinkedHashMap<String, Object>();
     if(m_repo.countByEmail(data.getEmail()) == 1) {
